@@ -12,6 +12,38 @@ const Plotly = window.Plotly;
 const Plot = createPlotlyComponent(Plotly);
 // App.js
 
+// const predict = (kabu) => {
+//   let result = [];
+//   let firstPredict = kabu.monam/kabu.sunday
+//   //月曜午前の値段がない場合
+//   if(kabu.monam === 0){
+//     result.push(`予測できません`);
+//   }
+//   //月曜午前判断A
+//   if((0.4 <= firstPredict && firstPredict <= 0.6) || (0.8 <= firstPredict && firstPredict <= 0.85)){
+//     result.push(`四期型`);
+//   }
+//   //月曜午前判断B
+//   if(0.6 <= firstPredict && firstPredict <= 0.8){
+//     //1-7以上に価格が下がる或いは同値
+//     if(((kabu.monam - kabu.monpm) <= -8 ) || (kabu.monam === kabu.monpm)){
+//       //Yes 波型? && 変動が+0.8以下
+//       if(kabu.tueam - kabu.monpm <= 0.8){
+//         result.push(`波型`);
+//       }
+//       //Yes 売値が+0.9以上
+//       else if(kabu.tueam - kabu.monpm >= 0.9){
+//         //次の代わり値
+//       }
+//       //No
+//       else{
+//         result.push(`波型`);
+//       }
+//     }
+//   }
+//   return result
+// }
+
 class Data extends React.Component {
   constructor(props){
     super(props);
@@ -274,6 +306,22 @@ class Graph extends React.Component{
       kabuAmount:0,
     };
   }
+  download(){
+    if(window.navigator && window.navigator.msSaveOrOpenBlob){
+      let blob = new Blob([decodeURIComponent(encodeURI(JSON.stringify(this.props.kabu)))], {
+        type: "application/json;charset=utf-8;"
+      });
+      navigator.msSaveOrOpenBlob(blob, "export.json");
+    } else {
+      let a = document.createElement('a');
+      a.download = "export.json";
+      a.href = "data:application/json;charset=utf-8;," + encodeURIComponent(JSON.stringify(this.props.kabu));
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  }
   render(){
     return(
       <div>
@@ -406,6 +454,7 @@ class Graph extends React.Component{
                 value={this.props.kabu.kabuAmount}
                 onChange={e => this.props.setKabuAmount(parseInt(e.target.value))}
               />
+              <Button onClick={() => this.download()}>download</Button>
             </Paper>
           </Grid>
         </Grid>
